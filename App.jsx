@@ -43,33 +43,25 @@ class Header extends React.Component {
 
 class TextEditor extends React.Component {
 
-    indexAtStartOfLine(text, startIndex) {
+    indexAtStartOfLine(text, index) {
 
-        let endIndex = startIndex;
-
-        while (startIndex >= 0) {
-            if (startIndex == endIndex && text[startIndex] == '\n') startIndex--;
-            if (text[startIndex] != '\n') {
-                startIndex--;
-            } else {
-                break;
-            }
+        for (var i = index; i > 0; i--) {
+            if (text[i-1] == '\n') break;
         }
 
-        return startIndex;
+        return i;
+
     }
 
-    indexAtEndOfLine(text, endIndex) {
+    indexAtEndOfLine(text, index) {
 
-        while (endIndex <= text.length) {
-            if (text[endIndex] != '\n') {
-                endIndex++;
-            } else {
-                break;
-            }
+        //if (text[index] == '\n') return index;
+
+        for (var i = index; i < text.length; i++) {
+            if (text[i+1] == '\n' || text[i] == '\n') break;
         }
 
-        return endIndex;
+        return i+1;
 
     }
 
@@ -77,6 +69,8 @@ class TextEditor extends React.Component {
 
         let start = this.indexAtStartOfLine(text, cursorIndex);
         let end = this.indexAtEndOfLine(text, cursorIndex);
+
+        console.log(`${start}, ${end}`)
 
         return text.substring(start, end);
 

@@ -8,7 +8,8 @@ class App extends React.Component {
         super();
         this.state = {
             line: "",
-            fileDict: {}
+            fileDict: {},
+            currentFile: ""
         };
 
     }
@@ -35,14 +36,20 @@ class App extends React.Component {
         this.setState({line});  // ES6 'line: line'
     }
 
+    changeCurrentFile(fileName) {
+        this.setState({currentFile: fileName});
+    }
+
+
     render() {
 
         return (
            <div>
-              <Header />
+              <Header currentFile={this.state.currentFile}/>
               <div>
                 <TextEditor changeLine={this.changeLine.bind(this)} />
-                <FileList fileDict={this.state.fileDict}/>
+                <FileList fileDict={this.state.fileDict} 
+                          changeCurrentFile={this.changeCurrentFile.bind(this)} />
               </div>
               <Footer line={this.state.line} />
            </div>
@@ -58,13 +65,18 @@ class FileList extends React.Component {
         return Object.keys(dict);
     }
 
+    fileNameClicked(e) {
+        this.props.changeCurrentFile(e.fileName);
+    }
+
     render() {
 
         return (
             <ul style={{float: 'right'}}>
                 {this.getDictKeys(this.props.fileDict).map(function(fileName) {
-                    return <li>{fileName}</li>
-                })}
+                    return <li><a href="#" 
+                                  onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName}</a></li>
+                }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
             </ul>
         );
 
@@ -77,7 +89,12 @@ class Header extends React.Component {
     render() {
 
         return (
-            <p>Welcome to my React text editor!</p>
+            <div>
+                <p>Welcome to the ReactJS text editor!</p>
+                <p>Currently editing {this.props.currentFile.length > 0 
+                                        ? <strong>{this.props.currentFile}</strong>
+                                        : 'a new file.'}</p>
+            </div>
         );
 
     }

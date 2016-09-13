@@ -7,9 +7,8 @@ class App extends React.Component {
 
         super();
         this.state = {
-            line: "test",
-            fileList: ['hello', 'world'],
-            data: ''
+            line: "",
+            fileDict: {}
         };
 
     }
@@ -22,7 +21,7 @@ class App extends React.Component {
             cache: false,
 
             success: function(data) {
-                this.setState({data});
+                this.setState({fileDict: data});
             }.bind(this),
 
             error: function(xhr, status, err) {
@@ -43,7 +42,7 @@ class App extends React.Component {
               <Header />
               <div>
                 <TextEditor changeLine={this.changeLine.bind(this)} />
-                <FileList fileList={this.state.fileList}/>
+                <FileList fileDict={this.state.fileDict}/>
               </div>
               <Footer line={this.state.line} />
            </div>
@@ -55,11 +54,15 @@ class App extends React.Component {
 
 class FileList extends React.Component {
 
+    getDictKeys(dict) {
+        return Object.keys(dict);
+    }
+
     render() {
 
         return (
             <ul style={{float: 'right'}}>
-                {this.props.fileList.map(function(fileName) {
+                {this.getDictKeys(this.props.fileDict).map(function(fileName) {
                     return <li>{fileName}</li>
                 })}
             </ul>

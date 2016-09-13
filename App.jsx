@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery'
 
 class App extends React.Component {
 
@@ -6,8 +7,28 @@ class App extends React.Component {
 
         super();
         this.state = {
-            line: "test"
+            line: "test",
+            fileList: ['hello', 'world'],
+            data: ''
         };
+
+    }
+
+    componentDidMount() {
+        
+        this.serverRequest = $.ajax({
+            url: './data.json',
+            dataType: 'json',
+            cache: false,
+
+            success: function(data) {
+                this.setState({data});
+            }.bind(this),
+
+            error: function(xhr, status, err) {
+                console.error('./data.json', status, err.toString());
+            }.bind(this)
+        });
 
     }
 
@@ -20,9 +41,28 @@ class App extends React.Component {
         return (
            <div>
               <Header />
-              <TextEditor changeLine={this.changeLine.bind(this)} />
+              <div>
+                <TextEditor changeLine={this.changeLine.bind(this)} />
+                <FileList fileList={this.state.fileList}/>
+              </div>
               <Footer line={this.state.line} />
            </div>
+        );
+
+    }
+
+}
+
+class FileList extends React.Component {
+
+    render() {
+
+        return (
+            <ul style={{float: 'right'}}>
+                {this.props.fileList.map(function(fileName) {
+                    return <li>{fileName}</li>
+                })}
+            </ul>
         );
 
     }

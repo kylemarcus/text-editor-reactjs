@@ -12,7 +12,7 @@ class App extends React.Component {
     }
 
     changeLine(line) {
-        this.setState({line});  // ES6
+        this.setState({line});  // ES6 'line: line'
     }
 
     render() {
@@ -55,8 +55,6 @@ class TextEditor extends React.Component {
 
     indexAtEndOfLine(text, index) {
 
-        //if (text[index] == '\n') return index;
-
         for (var i = index; i < text.length; i++) {
             if (text[i+1] == '\n' || text[i] == '\n') break;
         }
@@ -69,8 +67,6 @@ class TextEditor extends React.Component {
 
         let start = this.indexAtStartOfLine(text, cursorIndex);
         let end = this.indexAtEndOfLine(text, cursorIndex);
-
-        console.log(`${start}, ${end}`)
 
         return text.substring(start, end);
 

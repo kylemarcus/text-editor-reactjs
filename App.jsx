@@ -37,7 +37,8 @@ class App extends React.Component {
     }
 
     changeCurrentFile(fileName) {
-        this.setState({currentFile: fileName});
+        this.setState({currentFile: fileName, line: ""});
+        this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
     }
 
 
@@ -47,7 +48,7 @@ class App extends React.Component {
            <div>
               <Header currentFile={this.state.currentFile}/>
               <div>
-                <TextEditor changeLine={this.changeLine.bind(this)} />
+                <TextEditor ref="textEditor" changeLine={this.changeLine.bind(this)} />
                 <FileList fileDict={this.state.fileDict} 
                           changeCurrentFile={this.changeCurrentFile.bind(this)} />
               </div>
@@ -139,6 +140,10 @@ class TextEditor extends React.Component {
 
         this.props.changeLine(this.getLineAtCursorLocation(text, cursorIndex));
 
+    }
+
+    setNewText(text) {
+        this.refs.textEditorTextArea.value = text;
     }
 
     render() {

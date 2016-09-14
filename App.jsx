@@ -48,7 +48,17 @@ class App extends React.Component {
 
         this.refs.fileList.setSavedFile(true);
         setTimeout((function() { this.refs.fileList.setSavedFile(false); }).bind(this), 3000);
+
         // TODO: send this new file to the server
+    }
+
+    deleteFile(fileName) {
+        delete this.state.fileDict[fileName]
+
+        this.refs.fileList.setDeletedFile(true, fileName);
+        setTimeout((function() { this.refs.fileList.setDeletedFile(false); }).bind(this), 3000);
+
+        // TODO: tell the server to delete the file
     }
 
     render() {
@@ -66,6 +76,7 @@ class App extends React.Component {
                           changeCurrentFile={this.changeCurrentFile.bind(this)}
                           currentFile={this.state.currentFile}
                           saveFile={this.saveFile.bind(this)}
+                          deleteFile={this.deleteFile.bind(this)}
                           ref="fileList" />
                   </Col>
                 </Row>
@@ -84,7 +95,9 @@ class FileList extends React.Component {
 
         super();
         this.state = {
-            savedFile: false
+            savedFile: false,
+            deletedFile: false,
+            fileNameDeleted: ""
         };
 
     }
@@ -98,12 +111,11 @@ class FileList extends React.Component {
     }
 
     saveClicked(e) {
-        console.log(`saved clicked for ${e.fileName}`);
         this.props.saveFile(e.fileName);
     }
 
     deleteClicked(e) {
-        console.log(`delete clicked for ${e.fileName}`);
+        this.props.deleteFile(e.fileName);
     }
 
     newFileClicked(e) {
@@ -114,14 +126,24 @@ class FileList extends React.Component {
         this.setState({savedFile: saved})
     }
 
+    setDeletedFile(deleted, fileName="") {
+        this.setState({deletedFile: deleted, fileNameDeleted: fileName});
+    }
+
     render() {
 
         return (
             <div>
                 
                 <Collapse in={this.state.savedFile}>
-                    <Alert ref="alert" bsStyle="warning">
+                    <Alert ref="alert" bsStyle="success">
                         The file <strong>{this.props.currentFile}</strong> was <strong>saved!</strong>
+                    </Alert>
+                </Collapse>
+
+                <Collapse in={this.state.deletedFile}>
+                    <Alert ref="alert" bsStyle="danger">
+                        The file <strong>{this.state.fileNameDeleted}</strong> was <strong>deleted!</strong>
                     </Alert>
                 </Collapse>
 

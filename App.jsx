@@ -42,6 +42,12 @@ class App extends React.Component {
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
     }
 
+    saveFile(fileName) {
+        console.log(`saving ${fileName} from main app`);
+        let newTextToSave = this.refs.textEditor.getTextAreaText();
+        this.state.fileDict[fileName] = newTextToSave;
+    }
+
     render() {
 
         return (
@@ -55,7 +61,8 @@ class App extends React.Component {
                   <Col xs={6} md={4}>
                     <FileList fileDict={this.state.fileDict} 
                           changeCurrentFile={this.changeCurrentFile.bind(this)}
-                          currentFile={this.state.currentFile} />
+                          currentFile={this.state.currentFile}
+                          saveFile={this.saveFile.bind(this)} />
                   </Col>
                 </Row>
               </Grid>
@@ -79,6 +86,7 @@ class FileList extends React.Component {
 
     saveClicked(e) {
         console.log(`saved clicked for ${e.fileName}`);
+        this.props.saveFile(e.fileName);
     }
 
     deleteClicked(e) {
@@ -102,7 +110,7 @@ class FileList extends React.Component {
                                           style={{float: 'right', color: 'red', marginLeft: 15}}></span> 
                                     <span onClick={this.saveClicked.bind(this, {fileName})} 
                                           className="glyphicon glyphicon-ok" 
-                                          style={{float: 'right', color: (true ? 'green' : 'yellow')}}></span>
+                                          style={{float: 'right', color: 'green'}}></span>
                                </ListGroupItem>
                     }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
                 </ListGroup>
@@ -174,6 +182,10 @@ class TextEditor extends React.Component {
 
     setNewText(text) {
         this.refs.textEditorTextArea.value = text;
+    }
+
+    getTextAreaText() {
+        return this.refs.textEditorTextArea.value;
     }
 
     render() {

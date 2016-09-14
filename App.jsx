@@ -1,6 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
-import { PageHeader, Grid, Row, Col, ListGroup, ListGroupItem, Navbar, Button } from 'react-bootstrap';
+import { PageHeader, Grid, Row, Col, ListGroup, ListGroupItem, Navbar, Button, Alert, Collapse } from 'react-bootstrap';
 
 class App extends React.Component {
 
@@ -43,9 +43,12 @@ class App extends React.Component {
     }
 
     saveFile(fileName) {
-        console.log(`saving ${fileName} from main app`);
         let newTextToSave = this.refs.textEditor.getTextAreaText();
         this.state.fileDict[fileName] = newTextToSave;
+
+        this.refs.fileList.setSavedFile(true);
+        setTimeout((function() { this.refs.fileList.setSavedFile(false); }).bind(this), 3000);
+        // TODO: send this new file to the server
     }
 
     render() {
@@ -62,7 +65,8 @@ class App extends React.Component {
                     <FileList fileDict={this.state.fileDict} 
                           changeCurrentFile={this.changeCurrentFile.bind(this)}
                           currentFile={this.state.currentFile}
-                          saveFile={this.saveFile.bind(this)} />
+                          saveFile={this.saveFile.bind(this)}
+                          ref="fileList" />
                   </Col>
                 </Row>
               </Grid>
@@ -75,6 +79,15 @@ class App extends React.Component {
 }
 
 class FileList extends React.Component {
+
+    constructor() {
+
+        super();
+        this.state = {
+            savedFile: false
+        };
+
+    }
 
     getDictKeys(dict) {
         return Object.keys(dict);
@@ -97,10 +110,21 @@ class FileList extends React.Component {
         console.log("new file clicked!");
     }
 
+    setSavedFile(saved) {
+        this.setState({savedFile: saved})
+    }
+
     render() {
 
         return (
             <div>
+                
+                <Collapse in={this.state.savedFile}>
+                    <Alert ref="alert" bsStyle="warning">
+                        The file <strong>{this.props.currentFile}</strong> was <strong>saved!</strong>
+                    </Alert>
+                </Collapse>
+
                 <ListGroup>
                     {this.getDictKeys(this.props.fileDict).map(function(fileName) {
                         return <ListGroupItem className={this.props.currentFile == fileName ? "active" : ""} 
@@ -116,6 +140,7 @@ class FileList extends React.Component {
                 </ListGroup>
 
                 <Button bsSize="large" block onClick={this.newFileClicked.bind(this)}>Add a new file</Button>
+
             </div>
         );
 

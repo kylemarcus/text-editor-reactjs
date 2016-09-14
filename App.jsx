@@ -1,6 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
-import { PageHeader } from 'react-bootstrap';
+import { PageHeader, Grid, Row, Col, ListGroup, ListGroupItem, Navbar } from 'react-bootstrap';
 
 class App extends React.Component {
 
@@ -48,11 +48,17 @@ class App extends React.Component {
         return (
            <div>
               <Header currentFile={this.state.currentFile}/>
-              <div>
-                <TextEditor ref="textEditor" changeLine={this.changeLine.bind(this)} />
-                <FileList fileDict={this.state.fileDict} 
+              <Grid style={{margin: 0}}>
+                <Row>
+                  <Col xs={12} md={8}>
+                    <TextEditor ref="textEditor" changeLine={this.changeLine.bind(this)} />
+                  </Col>
+                  <Col xs={6} md={4}>
+                    <FileList fileDict={this.state.fileDict} 
                           changeCurrentFile={this.changeCurrentFile.bind(this)} />
-              </div>
+                  </Col>
+                </Row>
+              </Grid>
               <Footer line={this.state.line} />
            </div>
         );
@@ -74,12 +80,16 @@ class FileList extends React.Component {
     render() {
 
         return (
-            <ul style={{float: 'right'}}>
+
+            <ListGroup>
                 {this.getDictKeys(this.props.fileDict).map(function(fileName) {
-                    return <li><a href="#" 
-                                  onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName}</a></li>
+                    return <ListGroupItem onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName}</ListGroupItem>
                 }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
-            </ul>
+            </ListGroup>
+
+
+
+            
         );
 
     }
@@ -151,7 +161,8 @@ class TextEditor extends React.Component {
 
         return (
             <textarea ref="textEditorTextArea" 
-                      rows="50" cols="150" 
+                      rows="40"
+                      style={{minWidth: '100%'}}
                       onKeyUp={this.handleChange.bind(this)} 
                       onMouseUp={this.handleChange.bind(this)} />
         );
@@ -164,7 +175,16 @@ class Footer extends React.Component {
     render() {
 
         return (
-            <h1>{this.props.line}</h1>
+
+            <Navbar fixedBottom>
+              <Navbar.Text>
+                <h2>{this.props.line}</h2>
+              </Navbar.Text>
+            
+          </Navbar>
+
+
+            
         );
 
     }

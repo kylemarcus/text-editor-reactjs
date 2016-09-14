@@ -54,7 +54,8 @@ class App extends React.Component {
                   </Col>
                   <Col xs={6} md={4}>
                     <FileList fileDict={this.state.fileDict} 
-                          changeCurrentFile={this.changeCurrentFile.bind(this)} />
+                          changeCurrentFile={this.changeCurrentFile.bind(this)}
+                          currentFile={this.state.currentFile} />
                   </Col>
                 </Row>
               </Grid>
@@ -94,13 +95,14 @@ class FileList extends React.Component {
             <div>
                 <ListGroup>
                     {this.getDictKeys(this.props.fileDict).map(function(fileName) {
-                        return <ListGroupItem onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName} 
+                        return <ListGroupItem className={this.props.currentFile == fileName ? "active" : ""} 
+                                              onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName} 
                                     <span onClick={this.deleteClicked.bind(this, {fileName})} 
                                           className="glyphicon glyphicon-remove" 
                                           style={{float: 'right', color: 'red', marginLeft: 15}}></span> 
                                     <span onClick={this.saveClicked.bind(this, {fileName})} 
                                           className="glyphicon glyphicon-ok" 
-                                          style={{float: 'right', color: 'green'}}></span>
+                                          style={{float: 'right', color: (true ? 'green' : 'yellow')}}></span>
                                </ListGroupItem>
                     }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
                 </ListGroup>

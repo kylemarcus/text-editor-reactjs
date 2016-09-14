@@ -1,6 +1,6 @@
 import React from 'react';
 import $ from 'jquery';
-import { PageHeader, Grid, Row, Col, ListGroup, ListGroupItem, Navbar } from 'react-bootstrap';
+import { PageHeader, Grid, Row, Col, ListGroup, ListGroupItem, Navbar, Button } from 'react-bootstrap';
 
 class App extends React.Component {
 
@@ -42,13 +42,12 @@ class App extends React.Component {
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
     }
 
-
     render() {
 
         return (
            <div>
               <Header currentFile={this.state.currentFile}/>
-              <Grid style={{margin: 0}}>
+              <Grid>
                 <Row>
                   <Col xs={12} md={8}>
                     <TextEditor ref="textEditor" changeLine={this.changeLine.bind(this)} />
@@ -77,19 +76,37 @@ class FileList extends React.Component {
         this.props.changeCurrentFile(e.fileName);
     }
 
+    saveClicked(e) {
+        console.log(`saved clicked for ${e.fileName}`);
+    }
+
+    deleteClicked(e) {
+        console.log(`delete clicked for ${e.fileName}`);
+    }
+
+    newFileClicked(e) {
+        console.log("new file clicked!");
+    }
+
     render() {
 
         return (
+            <div>
+                <ListGroup>
+                    {this.getDictKeys(this.props.fileDict).map(function(fileName) {
+                        return <ListGroupItem onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName} 
+                                    <span onClick={this.deleteClicked.bind(this, {fileName})} 
+                                          className="glyphicon glyphicon-remove" 
+                                          style={{float: 'right', color: 'red', marginLeft: 15}}></span> 
+                                    <span onClick={this.saveClicked.bind(this, {fileName})} 
+                                          className="glyphicon glyphicon-ok" 
+                                          style={{float: 'right', color: 'green'}}></span>
+                               </ListGroupItem>
+                    }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
+                </ListGroup>
 
-            <ListGroup>
-                {this.getDictKeys(this.props.fileDict).map(function(fileName) {
-                    return <ListGroupItem onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName}</ListGroupItem>
-                }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
-            </ListGroup>
-
-
-
-            
+                <Button bsSize="large" block onClick={this.newFileClicked.bind(this)}>Add a new file</Button>
+            </div>
         );
 
     }
@@ -180,11 +197,8 @@ class Footer extends React.Component {
               <Navbar.Text>
                 <h2>{this.props.line}</h2>
               </Navbar.Text>
-            
-          </Navbar>
+            </Navbar>
 
-
-            
         );
 
     }

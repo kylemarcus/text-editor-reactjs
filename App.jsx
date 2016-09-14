@@ -1,5 +1,6 @@
 import React from 'react';
-import $ from 'jquery'
+import $ from 'jquery';
+import { PageHeader } from 'react-bootstrap';
 
 class App extends React.Component {
 
@@ -90,12 +91,12 @@ class Header extends React.Component {
     render() {
 
         return (
-            <div>
-                <p>Welcome to the ReactJS text editor!</p>
-                <p>Currently editing {this.props.currentFile.length > 0 
-                                        ? <strong>{this.props.currentFile}</strong>
-                                        : 'a new file.'}</p>
-            </div>
+            <PageHeader style={{padding: '0px 0px 0px 10px'}}>Welcome to the ReactJS text editor! 
+                <small> Currently editing {this.props.currentFile.length > 0 
+                    ? <strong>{this.props.currentFile}</strong>
+                    : 'a new file.'}
+                </small>
+            </PageHeader>
         );
 
     }

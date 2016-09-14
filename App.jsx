@@ -194,9 +194,9 @@ class Footer extends React.Component {
         return (
 
             <Navbar fixedBottom>
-              <Navbar.Text>
-                <h2>{this.props.line}</h2>
-              </Navbar.Text>
+              <Navbar.Brand>
+                {this.props.line}
+              </Navbar.Brand>
             </Navbar>
 
         );

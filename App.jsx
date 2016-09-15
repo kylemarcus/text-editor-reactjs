@@ -61,6 +61,14 @@ class App extends React.Component {
         // TODO: tell the server to delete the file
     }
 
+    newFile(fileName) {
+        this.state.fileDict[fileName] = "";
+        this.setState({currentFile: fileName});
+        this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
+
+        // TODO: tell the server to create new file
+    }
+
     render() {
 
         return (
@@ -77,6 +85,7 @@ class App extends React.Component {
                           currentFile={this.state.currentFile}
                           saveFile={this.saveFile.bind(this)}
                           deleteFile={this.deleteFile.bind(this)}
+                          newFile={this.newFile.bind(this)}
                           ref="fileList" />
                   </Col>
                 </Row>
@@ -119,7 +128,7 @@ class FileList extends React.Component {
     }
 
     newFileClicked(e) {
-        console.log("new file clicked!");
+        this.props.newFile("test.txt");
     }
 
     setSavedFile(saved) {

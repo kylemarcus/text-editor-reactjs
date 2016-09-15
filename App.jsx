@@ -47,7 +47,8 @@ class App extends React.Component {
     }
 
     changeCurrentFile(fileName) {
-        this.setState({currentFile: fileName, line: "", fileChanged: false});
+        this.resetFileState(fileName);
+        //this.setState({currentFile: fileName, line: "", fileChanged: false});
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
     }
 
@@ -72,10 +73,15 @@ class App extends React.Component {
 
     newFile(fileName) {
         this.state.fileDict[fileName] = "";
-        this.setState({currentFile: fileName, line: "", fileChanged: false});
+        this.resetFileState(fileName);
+        //this.setState({currentFile: fileName, line: "", fileChanged: false});
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
 
         // TODO: tell the server to create new file
+    }
+
+    resetFileState(currentFile) {
+        this.setState({currentFile, line: "", fileChanged: false});
     }
 
     render() {

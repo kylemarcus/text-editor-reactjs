@@ -12,7 +12,8 @@ class App extends React.Component {
             line: "",
             fileDict: {},
             currentFile: "",
-            fileChanged: false
+            fileChanged: false,
+            fileNameSaved: ""
         };
 
     }
@@ -25,7 +26,9 @@ class App extends React.Component {
             cache: false,
 
             success: function(data) {
+                let file = Object.keys(data)[0];
                 this.setState({fileDict: data});
+                this.changeCurrentFile(file);
             }.bind(this),
 
             error: function(xhr, status, err) {
@@ -48,13 +51,13 @@ class App extends React.Component {
 
     changeCurrentFile(fileName) {
         this.resetFileState(fileName);
-        //this.setState({currentFile: fileName, line: "", fileChanged: false});
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
     }
 
     saveFile(fileName) {
         let newTextToSave = this.refs.textEditor.getTextAreaText();
         this.state.fileDict[fileName] = newTextToSave;
+        this.setState({fileNameSaved: fileName})
 
         this.refs.fileList.setSavedFile(true);
         setTimeout((function() { this.refs.fileList.setSavedFile(false); }).bind(this), 3000);
@@ -74,7 +77,6 @@ class App extends React.Component {
     newFile(fileName) {
         this.state.fileDict[fileName] = "";
         this.resetFileState(fileName);
-        //this.setState({currentFile: fileName, line: "", fileChanged: false});
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
 
         // TODO: tell the server to create new file
@@ -102,6 +104,7 @@ class App extends React.Component {
                           deleteFile={this.deleteFile.bind(this)}
                           newFile={this.newFile.bind(this)}
                           fileChanged={this.state.fileChanged}
+                          fileNameSaved={this.state.fileNameSaved}
                           ref="fileList" />
                   </Col>
                 </Row>
@@ -123,7 +126,10 @@ class FileList extends React.Component {
             savedFile: false,
             deletedFile: false,
             fileNameDeleted: "",
-            showModal: false
+            showCreateNewFileModal: false,
+            showSaveCurrentFileModal: false,
+            fileToSwitchTo: "",
+            newFileClicked: false
         };
 
     }
@@ -133,7 +139,23 @@ class FileList extends React.Component {
     }
 
     fileNameClicked(e) {
-        this.props.changeCurrentFile(e.fileName);
+        if (e.fileName != this.props.currentFile && this.props.fileChanged == true) {
+            this.setState({fileToSwitchTo: e.fileName});
+            this.openSaveCurrentFileModal();
+        } else {
+            this.props.changeCurrentFile(e.fileName);
+        }
+    }
+
+    discardCurrentFileChangesAndChangeFiles() {
+        this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        this.closeSaveCurrentFileModal();
+    }
+
+    saveCurrentFileChangesAndChangeFiles() {
+        this.props.saveFile(this.props.currentFile);
+        this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        this.closeSaveCurrentFileModal();
     }
 
     saveClicked(e) {
@@ -147,7 +169,7 @@ class FileList extends React.Component {
     newFileClicked() {
         let newFileName = ReactDOM.findDOMNode(this.refs.newFileName).value;
         this.props.newFile(newFileName);
-        this.close();
+        this.closeCreateNewFileModal();
     }
 
     setSavedFile(saved) {
@@ -158,12 +180,37 @@ class FileList extends React.Component {
         this.setState({deletedFile: deleted, fileNameDeleted: fileName});
     }
 
-    close() {
-        this.setState({ showModal: false });
+    closeCreateNewFileModal() {
+        this.setState({ showCreateNewFileModal: false });
     }
 
-    open() {
-        this.setState({ showModal: true });
+    openCreateNewFileModal() {
+        this.setState({ showCreateNewFileModal: true });
+    }
+
+    closeSaveCurrentFileModal() {
+        this.setState({ showSaveCurrentFileModal: false });
+        this.openNewFileModalIfNeeded();
+    }
+
+    openNewFileModalIfNeeded() {
+        if (this.state.newFileClicked == true) {
+            this.setState({newFileClicked: false});
+            this.openCreateNewFileModal();
+        }
+    }
+
+    openSaveCurrentFileModal() {
+        this.setState({ showSaveCurrentFileModal: true });
+    }
+
+    addNewFileBtnClicked() {
+        if (this.props.fileChanged == true) {
+            this.openSaveCurrentFileModal();
+            this.setState({newFileClicked: true});
+        } else {
+            this.openCreateNewFileModal();
+        }
     }
 
     render() {
@@ -173,7 +220,7 @@ class FileList extends React.Component {
                 
                 <Collapse in={this.state.savedFile}>
                     <Alert ref="alert" bsStyle="success">
-                        The file <strong>{this.props.currentFile}</strong> was <strong>saved!</strong>
+                        The file <strong>{this.props.fileNameSaved}</strong> was <strong>saved!</strong>
                     </Alert>
                 </Collapse>
 
@@ -197,9 +244,9 @@ class FileList extends React.Component {
                     }, this)} {/* need to bind 'this' to map in order to get access to methods in this class */}
                 </ListGroup>
 
-                <Button bsSize="large" block onClick={this.open.bind(this) /*this.newFileClicked.bind(this)*/}>Add a new file</Button>
+                <Button bsSize="large" block onClick={this.addNewFileBtnClicked.bind(this) /*this.openCreateNewFileModal.bind(this)*/}>Add a new file</Button>
 
-                <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
+                <Modal show={this.state.showCreateNewFileModal} onHide={this.closeCreateNewFileModal.bind(this)}>
                   <Modal.Header closeButton>
                     <Modal.Title>Create new file!</Modal.Title>
                   </Modal.Header>
@@ -216,7 +263,20 @@ class FileList extends React.Component {
                   </Modal.Body>
                   <Modal.Footer>
                     <Button bsStyle="primary" onClick={this.newFileClicked.bind(this)}>Create</Button>
-                    <Button onClick={this.close.bind(this)}>Cancle</Button>
+                    <Button onClick={this.closeCreateNewFileModal.bind(this)}>Cancle</Button>
+                  </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showSaveCurrentFileModal} onHide={this.closeSaveCurrentFileModal.bind(this)}>
+                  <Modal.Header closeButton>
+                    <Modal.Title><span className="glyphicon glyphicon-warning-sign" style={{color: 'red'}} /> Warning!</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>The file <strong>{this.props.currentFile}</strong> is un-saved.</p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button bsStyle="primary" onClick={this.saveCurrentFileChangesAndChangeFiles.bind(this)}>Save Changes</Button>
+                    <Button bsStyle="warning" onClick={this.discardCurrentFileChangesAndChangeFiles.bind(this)}>Discard Changes</Button>
                   </Modal.Footer>
                 </Modal>
 
@@ -233,9 +293,9 @@ class Header extends React.Component {
 
         return (
             <PageHeader style={{padding: '0px 0px 0px 10px'}}>Welcome to the ReactJS text editor! 
-                <small> Currently editing {this.props.currentFile.length > 0 
-                    ? <strong>{this.props.currentFile}</strong>
-                    : 'a new file.'}
+                <small>{this.props.currentFile.length > 0  
+                    ? <span> Currently editing <strong>{this.props.currentFile}</strong></span>
+                    : ' Choose a file to edit.'}
                 </small>
             </PageHeader>
         );
@@ -299,7 +359,7 @@ class TextEditor extends React.Component {
                       rows="40"
                       style={{minWidth: '100%'}}
                       onKeyUp={this.handleChange.bind(this)} 
-                      onMouseUp={this.handleChange.bind(this)} />
+                      onMouseUp={this.handleChange.bind(this)}/>
         );
 
     }

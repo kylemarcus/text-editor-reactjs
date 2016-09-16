@@ -52,6 +52,7 @@ class App extends React.Component {
     changeCurrentFile(fileName) {
         this.resetFileState(fileName);
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
+        this.refs.textEditor.enableTextArea();
     }
 
     saveFile(fileName) {
@@ -66,10 +67,20 @@ class App extends React.Component {
     }
 
     deleteFile(fileName) {
-        delete this.state.fileDict[fileName]
+
+        // TODO: what happens if the delted file is the current file?
+        if (this.state.currentFile == fileName) {
+            this.refs.textEditor.disableTextArea();
+            this.resetFileState("");
+            this.refs.textEditor.setNewText("");
+        }
+
+        delete this.state.fileDict[fileName];
 
         this.refs.fileList.setDeletedFile(true, fileName);
         setTimeout((function() { this.refs.fileList.setDeletedFile(false); }).bind(this), 3000);
+
+        
 
         // TODO: tell the server to delete the file
     }
@@ -78,6 +89,7 @@ class App extends React.Component {
         this.state.fileDict[fileName] = "";
         this.resetFileState(fileName);
         this.refs.textEditor.setNewText(this.state.fileDict[fileName]);
+        this.refs.textEditor.enableTextArea();
 
         // TODO: tell the server to create new file
     }
@@ -129,8 +141,11 @@ class FileList extends React.Component {
             showCreateNewFileModal: false,
             showSaveCurrentFileModal: false,
             fileToSwitchTo: "",
-            newFileClicked: false
+            newFileClicked: false,
+            deleteClickedOnCurrentFile: false
         };
+
+        this.deleteClickedOnCurrentFile = false;
 
     }
 
@@ -142,6 +157,8 @@ class FileList extends React.Component {
         if (e.fileName != this.props.currentFile && this.props.fileChanged == true) {
             this.setState({fileToSwitchTo: e.fileName});
             this.openSaveCurrentFileModal();
+        } else if (this.deleteClickedOnCurrentFile == true) {
+            this.deleteClickedOnCurrentFile = false;
         } else {
             this.props.changeCurrentFile(e.fileName);
         }
@@ -163,6 +180,10 @@ class FileList extends React.Component {
     }
 
     deleteClicked(e) {
+        if (e.fileName == this.props.currentFile) {
+            this.deleteClickedOnCurrentFile = true;
+        }
+        
         this.props.deleteFile(e.fileName);
     }
 
@@ -214,10 +235,8 @@ class FileList extends React.Component {
     }
 
     handleKeyPressOnSaveModal(target) {
-        console.log("here!")
         if (target.charCode == 13) {
             target.preventDefault();
-            console.log("enter clicked");
             this.newFileClicked();
         }
     }
@@ -243,9 +262,9 @@ class FileList extends React.Component {
                     {this.getDictKeys(this.props.fileDict).map(function(fileName) {
                         return <ListGroupItem className={this.props.currentFile == fileName ? "active" : ""} 
                                               onClick={this.fileNameClicked.bind(this, {fileName})}>{fileName} 
-                                    <span onClick={this.deleteClicked.bind(this, {fileName})} 
+                                    { fileName == this.props.currentFile ?<span onClick={this.deleteClicked.bind(this, {fileName})} 
                                           className="glyphicon glyphicon-remove" 
-                                          style={{float: 'right', color: 'red', marginLeft: 15}}></span> 
+                                          style={{float: 'right', color: 'red', marginLeft: 15}}></span> : null }
                                     { this.props.fileChanged && fileName == this.props.currentFile ? <span onClick={this.saveClicked.bind(this, {fileName})} 
                                           className="glyphicon glyphicon-save-file" 
                                           style={{float: 'right', color: 'yellow'}}></span> : null }
@@ -360,6 +379,14 @@ class TextEditor extends React.Component {
 
     getTextAreaText() {
         return this.refs.textEditorTextArea.value;
+    }
+
+    disableTextArea() {
+        this.refs.textEditorTextArea.disabled = true;
+    }
+
+    enableTextArea() {
+        this.refs.textEditorTextArea.disabled = false;
     }
 
     render() {

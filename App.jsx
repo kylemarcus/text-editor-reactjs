@@ -213,6 +213,15 @@ class FileList extends React.Component {
         }
     }
 
+    handleKeyPressOnSaveModal(target) {
+        console.log("here!")
+        if (target.charCode == 13) {
+            target.preventDefault();
+            console.log("enter clicked");
+            this.newFileClicked();
+        }
+    }
+
     render() {
 
         return (
@@ -257,6 +266,7 @@ class FileList extends React.Component {
                             type="text"
                             placeholder="File Name"
                             ref="newFileName"
+                            onKeyPress={this.handleKeyPressOnSaveModal.bind(this)}
                           />
                         </FormGroup>
                       </form>

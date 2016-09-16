@@ -98,6 +98,10 @@ class App extends React.Component {
         this.setState({currentFile, line: "", fileChanged: false});
     }
 
+    checkIfFileCanBeCreated(newFileName) {
+        return !(newFileName in this.state.fileDict);
+    }
+
     render() {
 
         return (
@@ -117,6 +121,7 @@ class App extends React.Component {
                           newFile={this.newFile.bind(this)}
                           fileChanged={this.state.fileChanged}
                           fileNameSaved={this.state.fileNameSaved}
+                          checkIfFileCanBeCreated={this.checkIfFileCanBeCreated.bind(this)}
                           ref="fileList" />
                   </Col>
                 </Row>
@@ -142,7 +147,8 @@ class FileList extends React.Component {
             showSaveCurrentFileModal: false,
             fileToSwitchTo: "",
             newFileClicked: false,
-            deleteClickedOnCurrentFile: false
+            deleteClickedOnCurrentFile: false,
+            showExistingFileNameWarningModal: false
         };
 
         this.deleteClickedOnCurrentFile = false;
@@ -189,8 +195,13 @@ class FileList extends React.Component {
 
     newFileClicked() {
         let newFileName = ReactDOM.findDOMNode(this.refs.newFileName).value;
-        this.props.newFile(newFileName);
-        this.closeCreateNewFileModal();
+        if (this.props.checkIfFileCanBeCreated(newFileName)) {
+            this.props.newFile(newFileName);
+            this.closeCreateNewFileModal();
+        } else {
+            this.setState({showExistingFileNameWarningModal: true});
+        }
+        
     }
 
     setSavedFile(saved) {
@@ -241,6 +252,10 @@ class FileList extends React.Component {
         }
     }
 
+    closeExistingFileNameWarningModal() {
+        this.setState({showExistingFileNameWarningModal: false});
+    }
+
     render() {
 
         return (
@@ -286,6 +301,7 @@ class FileList extends React.Component {
                             placeholder="File Name"
                             ref="newFileName"
                             onKeyPress={this.handleKeyPressOnSaveModal.bind(this)}
+                            autoFocus={true}
                           />
                         </FormGroup>
                       </form>
@@ -306,6 +322,18 @@ class FileList extends React.Component {
                   <Modal.Footer>
                     <Button bsStyle="primary" onClick={this.saveCurrentFileChangesAndChangeFiles.bind(this)}>Save Changes</Button>
                     <Button bsStyle="warning" onClick={this.discardCurrentFileChangesAndChangeFiles.bind(this)}>Discard Changes</Button>
+                  </Modal.Footer>
+                </Modal>
+
+                <Modal show={this.state.showExistingFileNameWarningModal} onHide={this.closeExistingFileNameWarningModal.bind(this)}>
+                  <Modal.Header closeButton>
+                    <Modal.Title><span className="glyphicon glyphicon-warning-sign" style={{color: 'red'}} /> Warning!</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <p>That file name is already used, please choose another name.</p>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button bsStyle="primary" onClick={this.closeExistingFileNameWarningModal.bind(this)}>Ok</Button>
                   </Modal.Footer>
                 </Modal>
 

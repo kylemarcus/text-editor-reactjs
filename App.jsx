@@ -171,7 +171,10 @@ class FileList extends React.Component {
     }
 
     discardCurrentFileChangesAndChangeFiles() {
-        this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        if (this.state.newFileClicked == false) {
+            this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        }
+        
         this.closeSaveCurrentFileModal();
     }
 

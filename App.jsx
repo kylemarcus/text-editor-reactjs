@@ -26,9 +26,9 @@ class App extends React.Component {
             cache: false,
 
             success: function(data) {
-                let file = Object.keys(data)[0];
                 this.setState({fileDict: data});
-                this.changeCurrentFile(file);
+                this.resetFileState("");
+                this.refs.textEditor.disableTextArea();
             }.bind(this),
 
             error: function(xhr, status, err) {

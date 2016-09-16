@@ -180,7 +180,9 @@ class FileList extends React.Component {
 
     saveCurrentFileChangesAndChangeFiles() {
         this.props.saveFile(this.props.currentFile);
-        this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        if (this.state.newFileClicked == false) {
+            this.props.changeCurrentFile(this.state.fileToSwitchTo);
+        }
         this.closeSaveCurrentFileModal();
     }
 

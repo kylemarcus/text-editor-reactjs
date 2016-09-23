@@ -2,14 +2,16 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {ListGroup, ListGroupItem} from 'react-bootstrap';
-
+import {selectFile} from '../actions/index';
 
 class FileList extends Component {
 
 	renderFileList() {
 		return Object.keys(this.props.files).map((fileName) => {
 			return (
-				<ListGroupItem>
+				<ListGroupItem 
+					onClick={() => this.props.selectFile(fileName)}
+				>
 					{fileName} 
                 </ListGroupItem>
 			);
@@ -31,4 +33,8 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(FileList);
+function matchDispatchToProps(dispatch) {
+    return bindActionCreators({selectFile: selectFile}, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchToProps)(FileList);

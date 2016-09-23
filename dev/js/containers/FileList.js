@@ -2,21 +2,38 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {ListGroup, ListGroupItem} from 'react-bootstrap';
-import {selectFile} from '../actions/index';
+import {selectFile, fileChanged} from '../actions/index';
 
 class FileList extends Component {
 
 	renderFileList() {
-		return Object.keys(this.props.files).map((fileName) => {
+		return this.props.files.map((file) => {
 			return (
 				<ListGroupItem 
-					onClick={() => this.props.selectFile(fileName)}
+					onClick={() => this.handleFilenameClick(file)}
+                    className={this.getListGroupItemClassName(file)}
 				>
-					{fileName} 
+					{file.filename} 
                 </ListGroupItem>
 			);
 		});
 	}
+
+    handleFilenameClick(file) {
+        if (file) {
+            this.props.selectFile(file);
+        }
+        
+    }
+
+    getListGroupItemClassName(file) {
+        let af = this.props.activeFile;
+        if (af && af.filename == file.filename) {
+            return "active";
+        } else {
+            return "";
+        }
+    }
 
     render() {
         return (
@@ -29,12 +46,19 @@ class FileList extends Component {
 
 function mapStateToProps(state) {
     return {
-        files: state.files
+        files: state.files,
+        activeFile: state.activeFile
     };
 }
 
 function matchDispatchToProps(dispatch) {
-    return bindActionCreators({selectFile: selectFile}, dispatch);
+    return bindActionCreators(
+        {
+            selectFile: selectFile, 
+            fileChanged: fileChanged
+        }, 
+        dispatch
+    );
 }
 
 export default connect(mapStateToProps, matchDispatchToProps)(FileList);

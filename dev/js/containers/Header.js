@@ -7,7 +7,7 @@ class Header extends Component {
 
     getHeaderSubText() {
         if (this.props.activeFile) {
-            return (<span> Currently editing <strong>{this.props.activeFile}</strong></span>);
+            return (<span> Currently editing <strong>{this.props.activeFile.filename}</strong></span>);
         } else {
             return (' Choose a file to edit.');
         }

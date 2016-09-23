@@ -1,6 +1,18 @@
+/* TODO: need to add cases to catch when the 
+ * active file changes to update this store!
+ */
+
 export default function () {
-    return {
-        "hello.txt": "this is\na test",
-        "world.txt": "hello\nworld\n\ntest"
-    }
+    return [
+    	{
+    		filename: "hello.txt",
+    		data: "this is\na test",
+            buffer: null
+    	},
+    	{
+    		filename: "world.txt",
+    		data: "test\n\ntest!!",
+            buffer: null
+    	}
+    ]
 }

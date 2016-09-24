@@ -1,8 +1,4 @@
-/* TODO: need to add cases to catch when the 
- * active file changes to update this store!
- */
-
- export const INITIAL_STATE = 
+export const INITIAL_STATE = 
     [
         {
             id: 1,

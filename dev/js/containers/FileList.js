@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {ListGroup, ListGroupItem} from 'react-bootstrap';
+import {Button, ListGroup, ListGroupItem} from 'react-bootstrap';
 import {selectFile} from '../actions/index';
 
 class FileList extends Component {
@@ -13,7 +13,7 @@ class FileList extends Component {
                     key={file.id}
                     id={file.id}
 					onClick={() => this.handleFilenameClick(file.id)}
-                    className={this.getListGroupItemClassName(file.id)}
+                    className={this.setActiveFile(file.id)}
 				>
 					{file.id} {file.filename} 
                 </ListGroupItem>
@@ -35,7 +35,7 @@ class FileList extends Component {
         
     }
 
-    getListGroupItemClassName(fileId) {
+    setActiveFile(fileId) {
         let af = this.props.activeFile;
         if (af && af.id == fileId) {
             return "active";
@@ -44,11 +44,24 @@ class FileList extends Component {
         }
     }
 
+    addNewFileBtnClicked() {
+        console.log("add a new file clicked");
+    }
+
     render() {
         return (
-            <ListGroup>
-            	{this.renderFileList()}
-            </ListGroup>
+            <div>
+                <ListGroup>
+                	{this.renderFileList()}
+                </ListGroup>
+                <Button 
+                    bsSize="large" 
+                    block 
+                    onClick={this.addNewFileBtnClicked.bind(this)}
+                >
+                    Add a new file
+                </Button>
+            </div>
         );
     }
 }

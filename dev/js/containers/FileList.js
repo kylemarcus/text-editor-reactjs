@@ -9,7 +9,9 @@ class FileList extends Component {
     constructor() {
         super();
         this.state = {
-            showCreateNewFileModal: false
+            showCreateNewFileModal: false,
+            showWarningModal: false,
+            newFilename: null
         };
     }
 
@@ -32,10 +34,8 @@ class FileList extends Component {
         console.log("<ONCLICK> [handleFilenameClick] id: " + fileId);
         if (fileId) {
             let f  = this.props.files.find(
-                        (file) => {
-                            return file.id == fileId;
-                        }
-                    );
+                        (file) => { return file.id == fileId }
+                     );
             console.log("[handleFilenameClick] calling [selectFile] with file: " + JSON.stringify(f));
             this.props.selectFile(f);
         }
@@ -52,10 +52,29 @@ class FileList extends Component {
     }
 
     toggleShowNewFileModal() {
-        this.setState(
-            {
-                showCreateNewFileModal: !this.state.showCreateNewFileModal
-            });
+        this.setState({showCreateNewFileModal: !this.state.showCreateNewFileModal});
+    }
+
+    toggleShowWarningModal() {
+        this.setState({showWarningModal: !this.state.showWarningModal});
+    }
+
+    handleNewFileNameChange(event) {
+        this.setState({newFilename: event.target.value});
+    }
+
+    handleCreateNewFileBtnClick() {
+        if (this.newFilenameAlreadyExists()) {
+            this.toggleShowWarningModal();
+        } else {
+            console.log("new file can be created");
+        }
+    }
+
+    newFilenameAlreadyExists() {
+        return this.props.files.find(
+            (file) => { return file.filename == this.state.newFilename }
+        );
     }
 
     render() {
@@ -74,25 +93,70 @@ class FileList extends Component {
                     Add a new file
                 </Button>
 
-                <Modal show={this.state.showCreateNewFileModal} onHide={() => this.toggleShowNewFileModal()}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Create new file!</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <form>
-                        <FormGroup>
-                          <FormControl
-                            type="text"
-                            placeholder="File Name"
-                            autoFocus={true}
-                          />
-                        </FormGroup>
-                      </form>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button bsStyle="primary">Create</Button>
-                    <Button onClick={() => this.toggleShowNewFileModal()}>Cancle</Button>
-                  </Modal.Footer>
+                <Modal 
+                    show={this.state.showCreateNewFileModal} 
+                    onHide={() => this.toggleShowNewFileModal()}
+                >
+                    <Modal.Header 
+                        closeButton
+                    >
+                        <Modal.Title>Create new file!</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form>
+                            <FormGroup>
+                                <FormControl
+                                    type="text"
+                                    placeholder="File Name"
+                                    autoFocus={true}
+                                    onChange={this.handleNewFileNameChange.bind(this)}
+                                />
+                            </FormGroup>
+                        </form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button 
+                            bsStyle="primary" 
+                            onClick={() => this.handleCreateNewFileBtnClick()}
+                        >
+                            Create
+                        </Button>
+                        <Button 
+                            onClick={() => this.toggleShowNewFileModal()}
+                        >
+                            Cancle
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal 
+                    show={this.state.showWarningModal} 
+                    onHide={() => this.toggleShowWarningModal()}
+                >
+                    <Modal.Header 
+                        closeButton
+                    >
+                        <Modal.Title>
+                            <span 
+                                className="glyphicon glyphicon-warning-sign" 
+                                style={{color: 'red'}}
+                            /> 
+                            Warning!
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>
+                            That file name is already used, please choose another name.
+                        </p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button 
+                            bsStyle="primary" 
+                            onClick={() => this.toggleShowWarningModal()}
+                        >
+                            Ok
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
 
             </div>

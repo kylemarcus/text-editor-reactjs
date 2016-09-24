@@ -5,6 +5,7 @@ import {fileChanged} from '../actions/index';
 
 class TextEditor extends Component {
     handleTextChange(e) {
+        //console.log("<ONCHANGE> [handleTextChange]\n\te: " + JSON.stringify(e));
         this.props.fileChanged(this.props.activeFile, e.target.value);
     }
 

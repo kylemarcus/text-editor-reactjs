@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {ListGroup, ListGroupItem} from 'react-bootstrap';
-import {selectFile, fileChanged} from '../actions/index';
+import {selectFile} from '../actions/index';
 
 class FileList extends Component {
 
@@ -10,25 +10,34 @@ class FileList extends Component {
 		return this.props.files.map((file) => {
 			return (
 				<ListGroupItem 
-					onClick={() => this.handleFilenameClick(file)}
-                    className={this.getListGroupItemClassName(file)}
+                    key={file.id}
+                    id={file.id}
+					onClick={() => this.handleFilenameClick(file.id)}
+                    className={this.getListGroupItemClassName(file.id)}
 				>
-					{file.filename} 
+					{file.id} {file.filename} 
                 </ListGroupItem>
 			);
 		});
 	}
 
-    handleFilenameClick(file) {
-        if (file) {
-            this.props.selectFile(file);
+    handleFilenameClick(fileId) {
+        console.log("<ONCLICK> [handleFilenameClick] id: " + fileId);
+        if (fileId) {
+            let f  = this.props.files.find(
+                        (file) => {
+                            return file.id == fileId;
+                        }
+                    );
+            console.log("[handleFilenameClick] calling [selectFile] with file: " + JSON.stringify(f));
+            this.props.selectFile(f);
         }
         
     }
 
-    getListGroupItemClassName(file) {
+    getListGroupItemClassName(fileId) {
         let af = this.props.activeFile;
-        if (af && af.filename == file.filename) {
+        if (af && af.id == fileId) {
             return "active";
         } else {
             return "";
@@ -54,8 +63,7 @@ function mapStateToProps(state) {
 function matchDispatchToProps(dispatch) {
     return bindActionCreators(
         {
-            selectFile: selectFile, 
-            fileChanged: fileChanged
+            selectFile: selectFile
         }, 
         dispatch
     );

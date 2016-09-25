@@ -83,105 +83,140 @@ class FileList extends Component {
         );
     }
 
+    renderCreatedNewFileAlert() {
+        return (
+            <Collapse in={this.state.createdNewFile}>
+                <Alert bsStyle="info">
+                    The file <strong>{this.state.newFilename}</strong> was <strong>created!</strong>
+                </Alert>
+            </Collapse>
+        );
+    }
+
+    renderDeletedFileAlert() {
+        return (
+            <Collapse in={this.state.deletedFile}>
+                <Alert bsStyle="danger">
+                    The file <strong>{this.state.fileNameDeleted}</strong> was <strong>deleted!</strong>
+                </Alert>
+            </Collapse>
+        );
+    }
+
+    renderSavedFileAlert() {
+        return (
+            <Collapse in={this.state.savedFile}>
+                <Alert bsStyle="success">
+                    The file <strong>{this.props.fileNameSaved}</strong> was <strong>saved!</strong>
+                </Alert>
+            </Collapse>
+        );
+    }
+
+    renderAddNewFileBtn() {
+        return (
+            <Button 
+                bsSize="large" 
+                block 
+                onClick={() => this.toggleShowNewFileModal()}
+            >
+                Add a new file
+            </Button>
+        );
+    }
+
+    renderCreateNewFileModal() {
+        return (
+            <Modal 
+                show={this.state.showCreateNewFileModal} 
+                onHide={() => this.toggleShowNewFileModal()}
+            >
+                <Modal.Header 
+                    closeButton
+                >
+                    <Modal.Title>Create new file!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <form>
+                        <FormGroup>
+                            <FormControl
+                                type="text"
+                                placeholder="File Name"
+                                autoFocus={true}
+                                onChange={this.handleNewFileNameChange.bind(this)}
+                            />
+                        </FormGroup>
+                    </form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button 
+                        bsStyle="primary" 
+                        onClick={() => this.handleCreateNewFileBtnClick()}
+                    >
+                        Create
+                    </Button>
+                    <Button 
+                        onClick={() => this.toggleShowNewFileModal()}
+                    >
+                        Cancle
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    renderWarngingModal() {
+        return (
+            <Modal 
+                show={this.state.showWarningModal} 
+                onHide={() => this.toggleShowWarningModal()}
+            >
+                <Modal.Header 
+                    closeButton
+                >
+                    <Modal.Title>
+                        <span 
+                            className="glyphicon glyphicon-warning-sign" 
+                            style={{color: 'red'}}
+                        /> 
+                        Warning!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        That file name is already used, please choose another name.
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button 
+                        bsStyle="primary" 
+                        onClick={() => this.toggleShowWarningModal()}
+                    >
+                        Ok
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
     render() {
         return (
             <div>
-
-                <Collapse in={this.state.savedFile}>
-                    <Alert bsStyle="success">
-                        The file <strong>{this.props.fileNameSaved}</strong> was <strong>saved!</strong>
-                    </Alert>
-                </Collapse>
-
-                <Collapse in={this.state.deletedFile}>
-                    <Alert bsStyle="danger">
-                        The file <strong>{this.state.fileNameDeleted}</strong> was <strong>deleted!</strong>
-                    </Alert>
-                </Collapse>
-
-                <Collapse in={this.state.createdNewFile}>
-                    <Alert bsStyle="info">
-                        The file <strong>{this.state.newFilename}</strong> was <strong>created!</strong>
-                    </Alert>
-                </Collapse>
+                {this.renderCreatedNewFileAlert()}
+                {this.renderDeletedFileAlert()}
+                {this.renderSavedFileAlert()}
 
                 <ListGroup>
                 	{this.renderFileList()}
                 </ListGroup>
 
-                <Button 
-                    bsSize="large" 
-                    block 
-                    onClick={() => this.toggleShowNewFileModal()}
-                >
-                    Add a new file
-                </Button>
+                {this.renderAddNewFileBtn()}
 
-                <Modal 
-                    show={this.state.showCreateNewFileModal} 
-                    onHide={() => this.toggleShowNewFileModal()}
-                >
-                    <Modal.Header 
-                        closeButton
-                    >
-                        <Modal.Title>Create new file!</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <form>
-                            <FormGroup>
-                                <FormControl
-                                    type="text"
-                                    placeholder="File Name"
-                                    autoFocus={true}
-                                    onChange={this.handleNewFileNameChange.bind(this)}
-                                />
-                            </FormGroup>
-                        </form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button 
-                            bsStyle="primary" 
-                            onClick={() => this.handleCreateNewFileBtnClick()}
-                        >
-                            Create
-                        </Button>
-                        <Button 
-                            onClick={() => this.toggleShowNewFileModal()}
-                        >
-                            Cancle
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                {this.renderCreateNewFileModal()}
 
-                <Modal 
-                    show={this.state.showWarningModal} 
-                    onHide={() => this.toggleShowWarningModal()}
-                >
-                    <Modal.Header 
-                        closeButton
-                    >
-                        <Modal.Title>
-                            <span 
-                                className="glyphicon glyphicon-warning-sign" 
-                                style={{color: 'red'}}
-                            /> 
-                            Warning!
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p>
-                            That file name is already used, please choose another name.
-                        </p>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button 
-                            bsStyle="primary" 
-                            onClick={() => this.toggleShowWarningModal()}
-                        >
-                            Ok
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                {this.renderWarngingModal()}
+
+                
 
             </div>
         );

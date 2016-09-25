@@ -27,7 +27,15 @@ class FileList extends Component {
 					onClick={() => this.handleFilenameClick(file.id)}
                     className={this.setActiveFile(file.id)}
 				>
-					{file.id} {file.filename} 
+					{file.filename}
+                <span 
+                    className="glyphicon glyphicon-remove" 
+                    style={{float: 'right', color: 'red', marginLeft: 15}}
+                />
+                <span
+                    className="glyphicon glyphicon-save-file" 
+                    style={{float: 'right', color: 'yellow'}}
+                />
                 </ListGroupItem>
 			);
 		});

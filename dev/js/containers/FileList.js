@@ -83,6 +83,13 @@ class FileList extends Component {
         );
     }
 
+    handleKeyPressOnSaveModal(target) {
+        if (target.charCode == 13) {
+            target.preventDefault();
+            this.handleCreateNewFileBtnClick();
+        }
+    }
+
     renderCreatedNewFileAlert() {
         return (
             <Collapse in={this.state.createdNewFile}>
@@ -144,6 +151,7 @@ class FileList extends Component {
                                 placeholder="File Name"
                                 autoFocus={true}
                                 onChange={this.handleNewFileNameChange.bind(this)}
+                                onKeyPress={this.handleKeyPressOnSaveModal.bind(this)}
                             />
                         </FormGroup>
                     </form>
@@ -213,11 +221,7 @@ class FileList extends Component {
                 {this.renderAddNewFileBtn()}
 
                 {this.renderCreateNewFileModal()}
-
                 {this.renderWarngingModal()}
-
-                
-
             </div>
         );
     }

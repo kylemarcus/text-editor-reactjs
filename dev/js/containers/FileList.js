@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, FormControl, FormGroup, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
-import {selectFile} from '../actions/index';
+import {Alert, Button, Collapse, FormControl, FormGroup, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
+import {selectFile, addNewFile} from '../actions/index';
 
 class FileList extends Component {
 
@@ -11,7 +11,10 @@ class FileList extends Component {
         this.state = {
             showCreateNewFileModal: false,
             showWarningModal: false,
-            newFilename: null
+            newFilename: null,
+            savedFile: false,
+            deletedFile: false,
+            createdNewFile: false
         };
     }
 
@@ -44,11 +47,7 @@ class FileList extends Component {
 
     setActiveFile(fileId) {
         let af = this.props.activeFile;
-        if (af && af.id == fileId) {
-            return "active";
-        } else {
-            return "";
-        }
+        return (af && af.id == fileId) ? "active" : "";
     }
 
     toggleShowNewFileModal() {
@@ -67,8 +66,15 @@ class FileList extends Component {
         if (this.newFilenameAlreadyExists()) {
             this.toggleShowWarningModal();
         } else {
-            console.log("new file can be created");
+            this.props.addNewFile(this.state.newFilename);
+            this.toggleShowNewFileModal();
+            this.toggleShowNewFileCreatedAlert();
+            setTimeout((() => { this.toggleShowNewFileCreatedAlert(); }).bind(this), 3000);
         }
+    }
+
+    toggleShowNewFileCreatedAlert() {
+        this.setState({createdNewFile: !this.state.createdNewFile});
     }
 
     newFilenameAlreadyExists() {
@@ -80,6 +86,24 @@ class FileList extends Component {
     render() {
         return (
             <div>
+
+                <Collapse in={this.state.savedFile}>
+                    <Alert bsStyle="success">
+                        The file <strong>{this.props.fileNameSaved}</strong> was <strong>saved!</strong>
+                    </Alert>
+                </Collapse>
+
+                <Collapse in={this.state.deletedFile}>
+                    <Alert bsStyle="danger">
+                        The file <strong>{this.state.fileNameDeleted}</strong> was <strong>deleted!</strong>
+                    </Alert>
+                </Collapse>
+
+                <Collapse in={this.state.createdNewFile}>
+                    <Alert bsStyle="info">
+                        The file <strong>{this.state.newFilename}</strong> was <strong>created!</strong>
+                    </Alert>
+                </Collapse>
 
                 <ListGroup>
                 	{this.renderFileList()}
@@ -174,7 +198,8 @@ function mapStateToProps(state) {
 function matchDispatchToProps(dispatch) {
     return bindActionCreators(
         {
-            selectFile: selectFile
+            selectFile: selectFile,
+            addNewFile: addNewFile
         }, 
         dispatch
     );

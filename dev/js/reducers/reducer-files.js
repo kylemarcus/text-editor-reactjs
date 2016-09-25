@@ -26,6 +26,16 @@ export default function (state = INITIAL_STATE, action) {
             });
             console.log("<REDUCER> [reducer-files] FILE_CHANGED\n\tpayload: " + JSON.stringify(action.payload) + "\n\treturned state: " + JSON.stringify(state));
             break;
+        case "ADD_NEW_FILE":
+            let nextId = Math.max.apply(Math,state.map(function(file){return file.id;})) + 1;
+            let newFile = {
+                id: nextId,
+                filename: action.payload,
+                data: "",
+                buffer: null
+            }
+            state.push(newFile);
+            break;
     }
     return state;
 }

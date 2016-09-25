@@ -20,3 +20,11 @@ export const fileChanged = (file, buffer) => {
         payload: file
     }
 };
+
+export const addNewFile = (filename) => {
+	console.log("<ACTION> [addNewFile] with filename: " + filename);
+    return {
+        type: 'ADD_NEW_FILE',
+        payload: filename
+    }
+};

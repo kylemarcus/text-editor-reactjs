@@ -28,9 +28,8 @@ export default function (state = INITIAL_STATE, action) {
             break;
         case "ADD_NEW_FILE":
             console.log("<REDUCER> [reducer-files] ADD_NEW_FILE");
-            let nextId = Math.max.apply(Math,state.map(function(file){return file.id;})) + 1;
             let newFile = {
-                id: nextId,
+                id: new Date().valueOf(),
                 filename: action.payload,
                 data: "",
                 buffer: null

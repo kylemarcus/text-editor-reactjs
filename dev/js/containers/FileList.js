@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Alert, Button, Collapse, FormControl, FormGroup, ListGroup, ListGroupItem, Modal} from 'react-bootstrap';
-import {selectFile, addNewFile} from '../actions/index';
+import {addNewFile, deleteFile, selectFile} from '../actions/index';
 
 class FileList extends Component {
 
@@ -14,8 +14,12 @@ class FileList extends Component {
             newFilename: null,
             savedFile: false,
             deletedFile: false,
-            createdNewFile: false
+            createdNewFile: false,
+            fileNameDeleted: null
         };
+        // this needs to be a class var because the state is
+        // not updated quickly enough between the 2 calls
+        this.deletedActiveFile = false;
     }
 
 	renderFileList() {
@@ -28,10 +32,12 @@ class FileList extends Component {
                     className={this.setActiveFile(file.id)}
 				>
 					{file.filename}
+                { this.props.activeFile && file.id == this.props.activeFile.id ?
                 <span 
+                    onClick={() => this.handleFileDeleteBtnClick(file.id)}
                     className="glyphicon glyphicon-remove" 
                     style={{float: 'right', color: 'red', marginLeft: 15}}
-                />
+                /> : null }
                 <span
                     className="glyphicon glyphicon-save-file" 
                     style={{float: 'right', color: 'yellow'}}
@@ -41,16 +47,32 @@ class FileList extends Component {
 		});
 	}
 
+    handleFileDeleteBtnClick(fileId) {
+        console.log("<ONCLICK> [handleFileDeleteBtnClick]");
+        this.toggleShowDeletedFileAlert(this.props.activeFile.filename);
+        setTimeout((() => { this.toggleShowDeletedFileAlert(null); }).bind(this), 3000);
+
+        this.props.deleteFile(fileId);
+        this.deletedActiveFile = true;
+    }
+
+    toggleShowDeletedFileAlert(filename) {
+        this.setState({deletedFile: !this.state.deletedFile, fileNameDeleted: filename});
+    }
+
     handleFilenameClick(fileId) {
-        console.log("<ONCLICK> [handleFilenameClick] id: " + fileId);
-        if (fileId) {
-            let f  = this.props.files.find(
-                        (file) => { return file.id == fileId }
-                     );
-            console.log("[handleFilenameClick] calling [selectFile] with file: " + JSON.stringify(f));
-            this.props.selectFile(f);
+        if (this.deletedActiveFile == true) {
+            this.deletedActiveFile = false;
+        } else {
+            console.log("<ONCLICK> [handleFilenameClick] id: " + fileId);
+            if (fileId) {
+                let f  = this.props.files.find(
+                            (file) => { return file.id == fileId }
+                         );
+                console.log("[handleFilenameClick] calling [selectFile] with file: " + JSON.stringify(f));
+                this.props.selectFile(f);
+            }
         }
-        
     }
 
     setActiveFile(fileId) {
@@ -246,7 +268,8 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators(
         {
             selectFile: selectFile,
-            addNewFile: addNewFile
+            addNewFile: addNewFile,
+            deleteFile: deleteFile
         }, 
         dispatch
     );

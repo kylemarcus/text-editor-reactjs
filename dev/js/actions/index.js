@@ -28,3 +28,11 @@ export const addNewFile = (filename) => {
         payload: filename
     }
 };
+
+export const deleteFile = (fileId) => {
+    console.log("<ACTION> [deleteFile] with fileId: " + fileId);
+    return {
+        type: 'DELETE_FILE',
+        payload: fileId
+    }
+};

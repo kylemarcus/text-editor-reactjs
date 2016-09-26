@@ -9,6 +9,10 @@ export default function (state = null, action) {
         	console.log("<REDUCER> [reducer-active-file] FILE_CHANGED\n\treturned: " + JSON.stringify(action.payload));
         	return action.payload;
             break;
+        case 'DELETE_FILE':
+            console.log("<REDUCER> [reducer-active-file] DELETE_FILE\n\treturned: null");
+            return null;
+            break;
     }
     return state;
 }

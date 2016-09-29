@@ -17,6 +17,7 @@ export const INITIAL_STATE =
 export default function (state = INITIAL_STATE, action) {
     switch (action.type) {
         case "FILE_CHANGED":
+            // replace the file object when file saved
             state = state.map((file)=> {
                 if( file.id == action.payload.id ) {
                     return action.payload
@@ -24,10 +25,9 @@ export default function (state = INITIAL_STATE, action) {
                     return file;
                 }
             });
-            console.log("<REDUCER> [reducer-files] FILE_CHANGED\n\tpayload: " + JSON.stringify(action.payload) + "\n\treturned state: " + JSON.stringify(state));
             break;
         case "ADD_NEW_FILE":
-            console.log("<REDUCER> [reducer-files] ADD_NEW_FILE");
+            // create a new file obj and push it onto the list
             let newFile = {
                 id: new Date().valueOf(),
                 filename: action.payload,
@@ -37,7 +37,7 @@ export default function (state = INITIAL_STATE, action) {
             state.push(newFile);
             break;
         case "DELETE_FILE":
-            console.log("<REDUCER> [reducer-files] DELETE_FILE");
+            // return a state without that file included
             state = state.filter((file) => {
                 return file.id != action.payload;
             });

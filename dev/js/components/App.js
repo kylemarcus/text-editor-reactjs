@@ -2,7 +2,6 @@ import React from 'react';
 import Header from '../containers/Header';
 import TextEditor from '../containers/TextEditor';
 import FileList from '../containers/FileList';
-import Footer from '../containers/Footer';
 import {Grid, Row, Col} from 'react-bootstrap';
 
 
@@ -19,7 +18,6 @@ const App = () => (
                 </Col>
             </Row>
         </Grid>
-        <Footer />
     </div>
 );
 

@@ -10,91 +10,59 @@ class FileList extends Component {
         super();
         this.state = {
             showCreateNewFileModal: false,
-            showWarningModal: false,
+            showFilenameWarningModal: false,
             newFilename: null,
             savedFile: false,
             deletedFile: false,
             createdNewFile: false,
             fileNameDeleted: null
         };
-        // this needs to be a class var because the state is
-        // not updated quickly enough between the 2 calls
+
+        // This doesn't need to be tracked so it can 
+        // come out of the state.
         this.deletedActiveFile = false;
     }
 
-	renderFileList() {
-		return this.props.files.map((file) => {
-			return (
-				<ListGroupItem 
-                    key={file.id}
-                    id={file.id}
-					onClick={() => this.handleFilenameClick(file.id)}
-                    className={this.setActiveFile(file.id)}
-				>
-					{file.filename}
-                { this.props.activeFile && file.id == this.props.activeFile.id ?
-                <span 
-                    onClick={() => this.handleFileDeleteBtnClick(file.id)}
-                    className="glyphicon glyphicon-remove" 
-                    style={{float: 'right', color: 'red', marginLeft: 15}}
-                /> : null }
-                <span
-                    className="glyphicon glyphicon-save-file" 
-                    style={{float: 'right', color: 'yellow'}}
-                />
-                </ListGroupItem>
-			);
-		});
-	}
+    /*
+     * State toggle functions
+     */
 
-    handleFileDeleteBtnClick(fileId) {
-        console.log("<ONCLICK> [handleFileDeleteBtnClick]");
-        this.toggleShowDeletedFileAlert(this.props.activeFile.filename);
-        setTimeout((() => { this.toggleShowDeletedFileAlert(null); }).bind(this), 3000);
+    toggleShowNewFileModal() {
+        this.setState({showCreateNewFileModal: !this.state.showCreateNewFileModal});
+    }
 
-        this.props.deleteFile(fileId);
-        this.deletedActiveFile = true;
+    toggleShowFilenameWarningModal() {
+        this.setState({showFilenameWarningModal: !this.state.showFilenameWarningModal});
+    }
+
+    toggleShowNewFileCreatedAlert() {
+        this.setState({createdNewFile: !this.state.createdNewFile});
     }
 
     toggleShowDeletedFileAlert(filename) {
         this.setState({deletedFile: !this.state.deletedFile, fileNameDeleted: filename});
     }
 
-    handleFilenameClick(fileId) {
-        if (this.deletedActiveFile == true) {
-            this.deletedActiveFile = false;
-        } else {
-            console.log("<ONCLICK> [handleFilenameClick] id: " + fileId);
-            if (fileId) {
-                let f  = this.props.files.find(
-                            (file) => { return file.id == fileId }
-                         );
-                console.log("[handleFilenameClick] calling [selectFile] with file: " + JSON.stringify(f));
-                this.props.selectFile(f);
-            }
+    /*
+     * Input handling functions
+     */
+
+    handleKeyPressOnSaveModal(target) {
+        // handle what happens when the return key is pressed on the modal
+        if (target.charCode == 13) {
+            target.preventDefault();
+            this.handleCreateNewFileBtnClick();
         }
     }
 
-    setActiveFile(fileId) {
-        let af = this.props.activeFile;
-        return (af && af.id == fileId) ? "active" : "";
-    }
-
-    toggleShowNewFileModal() {
-        this.setState({showCreateNewFileModal: !this.state.showCreateNewFileModal});
-    }
-
-    toggleShowWarningModal() {
-        this.setState({showWarningModal: !this.state.showWarningModal});
-    }
-
     handleNewFileNameChange(event) {
+        // needed to updated the filename when it is typed in
         this.setState({newFilename: event.target.value});
     }
 
     handleCreateNewFileBtnClick() {
         if (this.newFilenameAlreadyExists()) {
-            this.toggleShowWarningModal();
+            this.toggleShowFilenameWarningModal();
         } else {
             this.props.addNewFile(this.state.newFilename);
             this.toggleShowNewFileModal();
@@ -103,22 +71,42 @@ class FileList extends Component {
         }
     }
 
-    toggleShowNewFileCreatedAlert() {
-        this.setState({createdNewFile: !this.state.createdNewFile});
-    }
-
     newFilenameAlreadyExists() {
+        // check to see if the newFilename already exists in the file list
         return this.props.files.find(
             (file) => { return file.filename == this.state.newFilename }
         );
     }
 
-    handleKeyPressOnSaveModal(target) {
-        if (target.charCode == 13) {
-            target.preventDefault();
-            this.handleCreateNewFileBtnClick();
+    handleFilenameClick(fileId) {
+        // When the delete button is clicked on the UI, the handler for that
+        // btn is first run and then the handler for the row click is run. We
+        // need to make sure to unselect file if the active file is deleted.
+        if (this.deletedActiveFile == true) {
+            this.deletedActiveFile = false;
+        } else {
+            if (fileId) {
+                // find from the store the file that was clicked
+                let f  = this.props.files.find(
+                            (file) => { return file.id == fileId }
+                         );
+                this.props.selectFile(f);
+            }
         }
     }
+
+    handleFileDeleteBtnClick(fileId) {
+        // Show alert and remove after 3 seconds
+        this.toggleShowDeletedFileAlert(this.props.activeFile.filename);
+        setTimeout((() => { this.toggleShowDeletedFileAlert(null); }).bind(this), 3000);
+        // Delete the file from the store
+        this.props.deleteFile(fileId);
+        this.deletedActiveFile = true;
+    }
+
+    /*
+     * Page rendering functions
+     */
 
     renderCreatedNewFileAlert() {
         return (
@@ -140,14 +128,31 @@ class FileList extends Component {
         );
     }
 
-    renderSavedFileAlert() {
-        return (
-            <Collapse in={this.state.savedFile}>
-                <Alert bsStyle="success">
-                    The file <strong>{this.props.fileNameSaved}</strong> was <strong>saved!</strong>
-                </Alert>
-            </Collapse>
-        );
+    renderFileList() {
+        return this.props.files.map((file) => {
+            return (
+                <ListGroupItem 
+                    key={file.id}
+                    id={file.id}
+                    onClick={() => this.handleFilenameClick(file.id)}
+                    className={this.setActiveFileClassName(file.id)}
+                >
+                    {file.filename}
+                { this.props.activeFile && file.id == this.props.activeFile.id ?
+                <span 
+                    onClick={() => this.handleFileDeleteBtnClick(file.id)}
+                    className="glyphicon glyphicon-remove" 
+                    style={{float: 'right', color: 'red', marginLeft: 15}}
+                /> : null }
+                </ListGroupItem>
+            );
+        });
+    }
+
+    setActiveFileClassName(fileId) {
+        let af = this.props.activeFile;
+        // highlights the row if current row is active
+        return (af && af.id == fileId) ? "active" : "";
     }
 
     renderAddNewFileBtn() {
@@ -203,11 +208,11 @@ class FileList extends Component {
         );
     }
 
-    renderWarngingModal() {
+    renderFilenameWarngingModal() {
         return (
             <Modal 
-                show={this.state.showWarningModal} 
-                onHide={() => this.toggleShowWarningModal()}
+                show={this.state.showFilenameWarningModal} 
+                onHide={() => this.toggleShowFilenameWarningModal()}
             >
                 <Modal.Header 
                     closeButton
@@ -228,7 +233,7 @@ class FileList extends Component {
                 <Modal.Footer>
                     <Button 
                         bsStyle="primary" 
-                        onClick={() => this.toggleShowWarningModal()}
+                        onClick={() => this.toggleShowFilenameWarningModal()}
                     >
                         Ok
                     </Button>
@@ -242,7 +247,6 @@ class FileList extends Component {
             <div>
                 {this.renderCreatedNewFileAlert()}
                 {this.renderDeletedFileAlert()}
-                {this.renderSavedFileAlert()}
 
                 <ListGroup>
                 	{this.renderFileList()}
@@ -251,11 +255,15 @@ class FileList extends Component {
                 {this.renderAddNewFileBtn()}
 
                 {this.renderCreateNewFileModal()}
-                {this.renderWarngingModal()}
+                {this.renderFilenameWarngingModal()}
             </div>
         );
     }
 }
+
+/*
+ * Redux mappings for state and functions
+ */
 
 function mapStateToProps(state) {
     return {

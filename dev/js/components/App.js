@@ -4,7 +4,6 @@ import TextEditor from '../containers/TextEditor';
 import FileList from '../containers/FileList';
 import {Grid, Row, Col} from 'react-bootstrap';
 
-
 const App = () => (
     <div>
         <Header />

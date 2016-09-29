@@ -1,8 +1,8 @@
 export const selectFile = (file) => {
-	if (!file.buffer) {
+    if (!file.buffer) {
         // set the file buffer
-		file.buffer = file.data;
-	}
+        file.buffer = file.data;
+    }
     return {
         type: 'FILE_SELECTED',
         payload: file
@@ -11,7 +11,7 @@ export const selectFile = (file) => {
 
 export const fileChanged = (file, buffer) => {
     // save the buffer
-	file.buffer = buffer;
+    file.buffer = buffer;
     return {
         type: 'FILE_CHANGED',
         payload: file
